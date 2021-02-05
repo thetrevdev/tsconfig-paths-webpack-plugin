@@ -10,6 +10,7 @@ export interface Options {
   readonly context: string | undefined;
   readonly colors: boolean;
   readonly mainFields: string[];
+  readonly addMatchAll: boolean;
 }
 
 type ValidOptions = keyof Options;
@@ -21,7 +22,8 @@ const validOptions: ReadonlyArray<ValidOptions> = [
   "logLevel",
   "logInfoToStdOut",
   "context",
-  "mainFields"
+  "mainFields",
+  "addMatchAll",
 ];
 
 /**
@@ -67,14 +69,15 @@ function makeOptions(rawOptions: Partial<Options>): Options {
       logInfoToStdOut: false,
       context: undefined,
       colors: true,
-      mainFields: ["main"]
+      mainFields: ["main"],
+      addMatchAll: true,
     } as Options),
-    ...rawOptions
+    ...rawOptions,
   };
 
   const options2: Options = {
     ...options,
-    logLevel: options.logLevel.toUpperCase() as LogLevel
+    logLevel: options.logLevel.toUpperCase() as LogLevel,
   };
 
   return options2;

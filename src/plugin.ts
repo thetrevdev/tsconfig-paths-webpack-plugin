@@ -133,9 +133,7 @@ export class TsconfigPathsPlugin implements ResolverPlugin {
       this.log.logError(`Failed to load ${loadFrom}: ${loadResult.message}`);
     } else {
       this.log.logInfo(
-        `tsconfig-paths-webpack-plugin: Using config file at ${
-          loadResult.configFileAbsolutePath
-        }`
+        `tsconfig-paths-webpack-plugin: Using config file at ${loadResult.configFileAbsolutePath}`
       );
       this.baseUrl = options.baseUrl || loadResult.baseUrl;
       this.absoluteBaseUrl = options.baseUrl
@@ -144,7 +142,8 @@ export class TsconfigPathsPlugin implements ResolverPlugin {
       this.matchPath = TsconfigPaths.createMatchPathAsync(
         this.absoluteBaseUrl,
         loadResult.paths,
-        options.mainFields
+        options.mainFields,
+        options.addMatchAll
       );
     }
   }
@@ -220,7 +219,8 @@ function createPluginCallback(
 
     if (
       !innerRequest ||
-      (innerRequest.startsWith(".") || innerRequest.startsWith(".."))
+      innerRequest.startsWith(".") ||
+      innerRequest.startsWith("..")
     ) {
       return callback();
     }
@@ -242,7 +242,7 @@ function createPluginCallback(
         const newRequest = {
           ...request,
           request: foundMatch,
-          path: absoluteBaseUrl
+          path: absoluteBaseUrl,
         };
 
         // Only at this point we are sure we are dealing with the latest Webpack version (>= 4.0.0)
@@ -289,7 +289,8 @@ function createPluginLegacy(
 
     if (
       !innerRequest ||
-      (innerRequest.startsWith(".") || innerRequest.startsWith(".."))
+      innerRequest.startsWith(".") ||
+      innerRequest.startsWith("..")
     ) {
       return callback();
     }
@@ -311,7 +312,7 @@ function createPluginLegacy(
         const newRequest = {
           ...request,
           request: foundMatch,
-          path: absoluteBaseUrl
+          path: absoluteBaseUrl,
         };
 
         // Only at this point we are sure we are dealing with a legacy Webpack version (< 4.0.0)
@@ -323,7 +324,7 @@ function createPluginLegacy(
           target,
           newRequest,
           `Resolved request '${innerRequest}' to '${foundMatch}' using tsconfig.json paths mapping`,
-          createInnerCallback(function(err2: Error, result2: string): void {
+          createInnerCallback(function (err2: Error, result2: string): void {
             // Note:
             //  *NOT* using an arrow function here because arguments.length implies we have "this"
             //  That means "this" has to be in the current function scope, and not the scope above.
